@@ -6,6 +6,36 @@ if (!(Firebase && typeof(Firebase) == 'function')) {
 	throw new Error('Firebase not found, be sure to include d3fire after the Firebase script tag');
 }
 
+/**
+ * 
+ * @param {} fbase - Either a Firebase object/query or a string corresponding to the firebase URL
+ * @param {} opts - An object containing any or all of the following options:
+ * 			
+ * 		keyFunc : function(dataSnapshot)
+ * 			A function that takes a firebase snapshot and returns a key. In most
+ * 			cases this will be a unique identifier of the object within the firebase.
+ * 			Defaults to returning dataSnapshot.name(). 
+ * 
+ *  	createFunc : function(dataSnapshot) 
+ *  		A callback when a new object is created in the firebase. This function
+ *  		will most likely append some new object corresponding to the data. The 
+ *  		this keyword is available as the original selector so you can append to
+ *  		that. You MUST return the selector for the d3 objects created from this 
+ *  		callback if you want to be able to update/delete them later on. Defaults
+ *  		to a no-op
+ *  
+ *  	updateFunc : function(dataSnapshot)
+ *  		A callback when a firebase object is modified. The this keyword is available
+ *  		as the d3 object corresponding to the modified data so you can update
+ *  		attributes on this to change the element. No return needed. Defaults to
+ *  		a no-op.
+ *  
+ *  	deleteFunc : function(dataSnapshot)
+ *  		A callback when a firebase object is deleted. The this keyword is available
+ *  		as the d3 object corresponding to the deleted data. Defaults to
+ *  		`this.remove()` as this is probably more common than a no-op.
+ *  
+ */
 d3.selection.prototype.firebase = function(fbase, opts) {
 	
 	if (fbase && typeof(fbase) == 'object') {
