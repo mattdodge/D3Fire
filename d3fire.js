@@ -77,15 +77,15 @@ d3.selection.prototype.firebase = function(fbase, opts) {
 	var selection = this;
 	
 	theFirebase.on('child_added', function(snapshot) {
-		createFunc.call(selection, snapshot).attr('__firekey__', keyFunc(snapshot));
+		createFunc.call(selection, snapshot).attr('__firekey__', keyFunc(snapshot)).datum(snapshot);
 	});
 	
 	theFirebase.on('child_changed', function(snapshot) {
-		updateFunc.call(selection.selectAll('[__firekey__="' + keyFunc(snapshot) + '"]'), snapshot);
+		updateFunc.call(selection.selectAll('[__firekey__="' + keyFunc(snapshot) + '"]').datum(snapshot), snapshot);
 	});
 	
 	theFirebase.on('child_removed', function(snapshot) {
-		deleteFunc.call(selection.selectAll('[__firekey__="' + keyFunc(snapshot) + '"]'), snapshot);
+		deleteFunc.call(selection.selectAll('[__firekey__="' + keyFunc(snapshot) + '"]').datum(null), snapshot);
 	});
 	
 	return selection;
