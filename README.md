@@ -27,7 +27,7 @@ d3.select('svg').firebase(
         createFunc : function(newData) {
             // callback when data is added, maybe we want to add a text element?
             return this.append('text').text(newData.val());
-	},
+        },
         updateFunc : function(changedData) {
             // data was changed, let's change the text
             this.text(newData.val());
