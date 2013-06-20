@@ -13,7 +13,7 @@ Pretty simple, just include the script tag for this plugin after you have includ
 ```html 
 <script type='text/javascript' src='http://d3js.org/d3.v3.min.js'></script>
 <script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
-<script type='text/javascript' src'd3fire.min.js'></script>
+<script type='text/javascript' src='d3fire.min.js'></script>
 ```
 
 Use It
@@ -24,14 +24,14 @@ The plugin creates a new D3 function that operates on a selection called `fireba
 d3.select('svg').firebase(
     'https://yourfirebase.firebaseIO.com', 
     {
-  	createFunc : function(newData) {
+        createFunc : function(newData) {
             // callback when data is added, maybe we want to add a text element?
-    		return this.append('text').text(newData.val());
-		},
-    	updateFunc : function(changedData) {
+            return this.append('text').text(newData.val());
+	},
+        updateFunc : function(changedData) {
             // data was changed, let's change the text
-    		this.text(newData.val());
-    	}
+            this.text(newData.val());
+        }
     }
 );
 ```
