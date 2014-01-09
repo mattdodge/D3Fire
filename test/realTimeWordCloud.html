@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<!--
+ 
+To use this demo, create a firebase and load it up with some key-value pairs.
+
+The key should be the name of the object - it will appear in the bubble
+The value should be a number representing the relative size of the object. It will dictate the size of the bubble
+
+BE SURE TO ENTER YOUR FIREBASE URL IN THE JAVASCRIPT BELOW
+
+Watch the bubbles on this page change in size and appear/disappear as you modify your Firebase
+
+-->
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script type='text/javascript' src='https://cdn.firebase.com/v0/firebase.js'></script>
+        <script type='text/javascript' src='../d3fire.js'></script>
+
+        <title>D3Fire Test</title>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+            /******
+                ENTER YOUR FIREBASE URL HERE
+            ******/
+            var fbase = new Firebase('https://mattdodge.firebaseIO.com');
+
+                // Add an SVG element to the body
+                var wordCloud = d3.select("body")
+                    .append("svg")
+                    .attr("width", 600)
+                    .attr("height", 500);
+
+                /*
+                *  Connect our d3 selection to our Firebase
+                **/
+                wordCloud.firebase(fbase, {
+
+                    // How do we identify each data point?
+                    keyFunc : function(dataSnapshot) {
+                        return dataSnapshot.name();
+                    },
+
+                    // When new data is added to the Firebase
+                    createFunc : function(newData) {
+                        var g = this.append('g'),
+                            locX = Math.random() * 600,
+                            locY = Math.random() * 500;
+
+                        // On new data, create a circle and a text element
+                        //  and add it to the d3 selection (this)
+                        g.append('circle')
+                            .attr('cx', locX)
+                            .attr('cy', locY)
+                            .attr('fill', '#cccccc')
+                            .attr('r', newData.val() * 5);
+
+                        g.append('text')
+                            .text(newData.name())
+                            .attr('text-anchor','middle')
+                            .attr('x', locX)
+                            .attr('y', locY)
+                            .attr("dy", ".31em");
+
+                        // layThemOut just arranges the circles so they fit
+                        layThemOut();
+
+                        return g;
+                    },
+
+                    // What to do when a data point has changed
+                    updateFunc : function(newData) {
+
+                        // Animate the object (this) to the new radius
+                        this.select('circle')
+                            .transition()
+                            .each("end", layThemOut)
+                            .attr('r',newData.val()*5);
+
+                    },
+
+                    // When a data point gets deleted
+                    deleteFunc : function(deletedData) {
+
+                        // Remove the d3 element (this) 
+                        this.remove();
+                        layThemOut();
+                    }
+                });
+                
+
+                /**
+                * A function to lay out the bubbles, taken from D3 examples
+                */
+                function layThemOut() {
+                    var nodes = wordCloud.selectAll('g')[0], links = [];
+
+                    for (var i=0; i < nodes.length; i++) {
+                        for (var j=i+1; j<nodes.length; j++) {
+                            links.push({source:i, target:j});
+                        }
+                    }
+
+                    var linkPadding = 10;
+
+                    var packer = d3.layout.force()
+                        .size([600,500])
+                        .charge(0)
+                        .theta(0.5)
+                        .linkDistance(function(d) {
+                            return 1.5 * (parseInt(d3.select(d.source).select('circle').attr('r')) + parseInt(d3.select(d.target).select('circle').attr('r')) + linkPadding); 
+                        })
+                        .nodes(nodes)
+                        .links(links)
+                        .start();
+
+
+                    packer.on("tick", function(d) {
+                        packer.nodes().forEach(function(el) {
+                            d3.select(el).select('circle').attr('cx',el.x).attr('cy',el.y);
+                            d3.select(el).select('text').attr('x',el.x).attr('y',el.y);
+                        });
+                    });
+
+                }
+
+            </script>
+        </body>
+    </html>
