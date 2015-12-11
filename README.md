@@ -30,7 +30,7 @@ d3.select('svg').firebase(
         },
         updateFunc : function(changedData) {
             // data was changed, let's change the text
-            this.text(newData.val());
+            this.text(changedData.val());
         }
     }
 );
